@@ -1,0 +1,92 @@
+body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f8fafc; /* Light gray background */
+            color: #1e293b; /* Dark slate text */
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0; /* Light gray track */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* Gray thumb */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Darker gray on hover */
+        }
+        .sortable-header {
+            cursor: pointer;
+            position: relative;
+            padding-right: 20px; /* Space for arrow */
+        }
+        .sortable-header::after {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 4px solid transparent;
+            opacity: 0.5;
+        }
+        .sortable-header.asc::after {
+            border-bottom-color: #333;
+            opacity: 1;
+        }
+        .sortable-header.desc::after {
+            border-top-color: #333;
+            opacity: 1;
+        }
+
+        /* Custom styles for hamburger menu */
+        @media (max-width: 639px) { /* Tailwind's 'sm' breakpoint is 640px */
+            /* Hide the navigation by default on small screens */
+            #mainNav.mobile-menu-closed {
+                display: none;
+            }
+            /* Show the navigation when the menu is open */
+            #mainNav.mobile-menu-open {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                background-color: #2563eb; /* Match header blue */
+                position: absolute;
+                top: 64px; /* Height of header */
+                left: 0;
+                padding: 1rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 40;
+            }
+            #mainNav.mobile-menu-open button {
+                width: 100%;
+                text-align: left;
+                padding: 0.75rem 1rem;
+                margin-bottom: 0.5rem;
+                border-radius: 0.375rem;
+                /* Background and text color for mobile menu items */
+                background-color: transparent; /* Default mobile menu item background */
+                color: white; /* Default mobile menu item text */
+            }
+            /* Mobile menu button hover state */
+            #mainNav.mobile-menu-open button:hover {
+                background-color: white; /* White background on hover */
+                color: #2563eb; /* Blue text on hover */
+            }
+        }
+
+        /* General navigation button styles */
+        #mainNav button {
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+        }
+
+        /* Hover state for desktop navigation buttons */
+        #mainNav button:not(.bg-white):hover {
+            background-color: white;
+            color: #2563eb; /* Blue text */
+        }

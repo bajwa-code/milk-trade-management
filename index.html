@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milk Trade Manager</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="resources/css/main.css">
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Custom Modal Structure -->
+    <div id="customModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
+            <h3 id="modalTitle" class="text-xl font-semibold text-gray-800 mb-4"></h3>
+            <p id="modalMessage" class="text-gray-700 mb-6"></p>
+            <div class="flex justify-end space-x-3">
+                <button id="modalCancelBtn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors">
+                    Cancel
+                </button>
+                <button id="modalConfirmBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-md relative">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Milk Trade Manager</h1>
+            <!-- Hamburger menu button for small screens -->
+            <div class="sm:hidden">
+                <button id="hamburgerBtn" class="text-white focus:outline-none p-2 rounded-md hover:bg-blue-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Navigation links - hidden on small screens by default, flex on medium and up -->
+            <!-- Added mobile-menu-closed class to explicitly hide it on small screens -->
+            <nav id="mainNav" class="sm:flex space-x-4 mobile-menu-closed">
+                <button id="dashboardTab" class="px-4 py-2 rounded-md transition-colors">
+                    Dashboard
+                </button>
+                <button id="customersTab" class="px-4 py-2 rounded-md transition-colors">
+                    Customers
+                </button>
+                <button id="transactionsTab" class="px-4 py-2 rounded-md transition-colors">
+                    Transactions
+                </button>
+                <button id="paymentsTab" class="px-4 py-2 rounded-md transition-colors">
+                    Payments
+                </button>
+                <button id="reportsTab" class="px-4 py-2 rounded-md transition-colors">
+                    Reports
+                </button>
+                <button id="dataManagementTab" class="px-4 py-2 rounded-md transition-colors">
+                    Data Management
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto p-4 flex-grow">
+        <!-- Dashboard Section -->
+        <section id="dashboardSection" class="tab-content bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Dashboard Overview</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-blue-50 p-5 rounded-lg shadow-md flex items-center justify-between">
+                    <div>
+                        <p class="text-lg font-medium text-blue-700">Total Owed To You (Buyers)</p>
+                        <p id="totalOwedToYou" class="text-3xl font-bold text-blue-900 mt-1">₹0.00</p>
+                    </div>
+                    <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.592 1L21 12m-2.592 3C14.08 15.598 13.11 16 12 16m-3-4s-1.14-1.23-2.5-1.75M11 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V11m-5-10v4h4L14 3z"></path></svg>
+                </div>
+                <div class="bg-red-50 p-5 rounded-lg shadow-md flex items-center justify-between">
+                    <div>
+                        <p class="text-lg font-medium text-red-700">Total You Owe (Sellers)</p>
+                        <p id="totalYouOwe" class="text-3xl font-bold text-red-900 mt-1">₹0.00</p>
+                    </div>
+                    <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Customer Balances</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <input type="text" id="dashboardSearch" placeholder="Search customer balances..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="dashboardStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="dashboardEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-inner">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg sortable-header" data-sort-column="name">Customer Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="type">Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg sortable-header" data-sort-column="balance">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboardBalancesTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Balance rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="dashboardPagination" class="flex flex-wrap justify-center sm:justify-between items-center mt-4 gap-2">
+                <span id="dashboardEntryCount" class="text-sm text-gray-600"></span>
+            </div>
+        </section>
+
+        <!-- Customers Section -->
+        <section id="customersSection" class="tab-content hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Customer Management</h2>
+
+            <form id="customerForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 p-4 bg-blue-50 rounded-lg shadow-inner">
+                <input type="hidden" id="customerId">
+                <div>
+                    <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
+                    <input type="text" id="customerName" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="customerType" class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
+                    <select id="customerType" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">Select Type</option>
+                        <option value="seller">Seller (You buy from)</option>
+                        <option value="buyer">Buyer (You sell to)</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="customerPhone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input type="tel" id="customerPhone" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <!-- New fields for default transaction values -->
+                <div>
+                    <label for="defaultQuantity" class="block text-sm font-medium text-gray-700 mb-1">Default Quantity (Liters)</label>
+                    <input type="number" id="defaultQuantity" step="0.01" min="0" value="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="defaultRate" class="block text-sm font-medium text-gray-700 mb-1">Default Rate (₹/Liter)</label>
+                    <input type="number" id="defaultRate" step="0.01" min="0" value="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="defaultMilkType" class="block text-sm font-medium text-gray-700 mb-1">Default Milk Type</label>
+                    <select id="defaultMilkType" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">Select Default Milk Type</option>
+                        <option value="Buffalo">Buffalo</option>
+                        <option value="Cow">Cow</option>
+                    </select>
+                </div>
+                <!-- End new fields -->
+                <div class="md:col-span-2 flex justify-end space-x-3">
+                    <button type="reset" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors font-medium">Clear</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-md font-medium">Add/Update Customer</button>
+                </div>
+            </form>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">All Customers</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <input type="text" id="customerSearch" placeholder="Search customers..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="customerStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="customerEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-inner">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg sortable-header" data-sort-column="id">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="name">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="type">Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="phone">Phone</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="defaultQuantity">Default Quantity (L)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="defaultRate">Default Rate (₹/L)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="defaultMilkType">Default Milk Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Customer rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="customersPagination" class="flex flex-wrap justify-center sm:justify-between items-center mt-4 gap-2">
+                <span id="customerEntryCount" class="text-sm text-gray-600"></span>
+            </div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section id="transactionsSection" class="tab-content hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Milk Transactions</h2>
+
+            <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 p-4 bg-blue-50 rounded-lg shadow-inner">
+                <input type="hidden" id="transactionEditId"> <!-- Hidden field for editing -->
+                <div class="relative">
+                    <label for="transactionCustomerSearch" class="block text-sm font-medium text-gray-700 mb-1">Customer</label>
+                    <input type="text" id="transactionCustomerSearch" placeholder="Search customer by name..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <input type="hidden" id="transactionCustomerId" required> <!-- Hidden field to store selected ID -->
+                    <div id="customerSearchResults" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto mt-1 hidden">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+                <div>
+                    <label for="selectedCustomerTypeDisplay" class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
+                    <input type="text" id="selectedCustomerTypeDisplay" readonly class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 cursor-not-allowed sm:text-sm">
+                    <!-- The actual transaction type ('buy'/'sell') will be derived internally -->
+                </div>
+                <div>
+                    <label for="shift" class="block text-sm font-medium text-gray-700 mb-1">Morning or Evening</label>
+                    <select id="shift" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">Select Shift</option>
+                        <option value="Morning">Morning</option>
+                        <option value="Evening">Evening</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="transactionQuantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity (Liters)</label>
+                    <input type="number" id="transactionQuantity" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="transactionRate" class="block text-sm font-medium text-gray-700 mb-1">Rate (₹/Liter)</label>
+                    <input type="number" id="transactionRate" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="milkType" class="block text-sm font-medium text-gray-700 mb-1">Milk Type</label>
+                    <select id="milkType" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">Select Milk Type</option>
+                        <option value="Buffalo">Buffalo</option>
+                        <option value="Cow">Cow</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="transactionDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" id="transactionDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div class="md:col-span-2 flex justify-end">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-md font-medium">Add Transaction</button>
+                </div>
+            </form>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">All Transactions</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <input type="text" id="transactionSearch" placeholder="Search transactions..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="transactionStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="transactionEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-inner">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg sortable-header" data-sort-column="id">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="date">Date</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="customerName">Customer</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="customerTypeDisplay">Customer Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="quantity">Quantity (L)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="rate">Rate (₹/L)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="milkType">Milk Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="shift">Shift</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg sortable-header" data-sort-column="totalAmount">Total Amount (₹)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Transaction rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="transactionsPagination" class="flex flex-wrap justify-center sm:justify-between items-center mt-4 gap-2">
+                <span id="transactionEntryCount" class="text-sm text-gray-600"></span>
+            </div>
+            <!-- New Section: Check for Missing Transactions -->
+            <div class="bg-yellow-50 rounded-lg shadow-lg p-6 mt-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-3">Check for Missing Daily Transactions</h3>
+                <p class="text-gray-700 mb-4">Select a date to see which customers have no recorded transactions for that day.</p>
+                <div class="flex flex-col sm:flex-row gap-4 items-center mb-6">
+                    <label for="missingTransactionDate" class="block text-sm font-medium text-gray-700">Date to Check:</label>
+                    <input type="date" id="missingTransactionDate" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm flex-grow">
+                    <button id="checkMissingTransactionsBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-md font-medium flex-shrink-0">
+                        Check for Missing
+                    </button>
+                </div>
+                <div id="missingTransactionsResults" class="bg-white p-4 rounded-md border border-gray-200 min-h-[100px] max-h-[300px] overflow-y-auto">
+                    <p class="text-gray-500 text-sm">Results will appear here...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Payments Section -->
+        <section id="paymentsSection" class="tab-content hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Payment Management</h2>
+
+            <form id="paymentForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 p-4 bg-blue-50 rounded-lg shadow-inner">
+                <input type="hidden" id="paymentEditId"> <!-- Hidden field for editing -->
+                <div class="relative">
+                    <label for="paymentCustomerSearch" class="block text-sm font-medium text-gray-700 mb-1">Customer</label>
+                    <input type="text" id="paymentCustomerSearch" placeholder="Search customer by name..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <input type="hidden" id="paymentCustomerId" required> <!-- Hidden field to store selected ID -->
+                    <div id="paymentCustomerSearchResults" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto mt-1 hidden">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+                <div>
+                    <label for="paymentSelectedCustomerTypeDisplay" class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
+                    <input type="text" id="paymentSelectedCustomerTypeDisplay" readonly class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 cursor-not-allowed sm:text-sm">
+                </div>
+                <div>
+                    <label for="paymentType" class="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
+                    <select id="paymentType" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">Select Type</option>
+                        <option value="paid_to_seller">Paid to Seller</option>
+                        <option value="received_from_buyer">Received from Buyer</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
+                    <input type="number" id="paymentAmount" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" id="paymentDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div class="md:col-span-2 flex justify-end">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-md font-medium">Add Payment</button>
+                </div>
+            </form>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">All Payments</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <input type="text" id="paymentSearch" placeholder="Search payments..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="paymentStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <input type="date" id="paymentEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-inner">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg sortable-header" data-sort-column="id">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="date">Date</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="customerName">Customer</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="type">Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sortable-header" data-sort-column="amount">Amount (₹)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Payment rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="paymentsPagination" class="flex flex-wrap justify-center sm:justify-between items-center mt-4 gap-2">
+                <span id="paymentEntryCount" class="text-sm text-gray-600"></span>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reportsSection" class="tab-content hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Reports & Analytics</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg shadow-inner">
+                <div>
+                    <label for="reportStartDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                    <input type="date" id="reportStartDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="reportEndDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                    <input type="date" id="reportEndDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Summary for Selected Period</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-indigo-50 p-5 rounded-lg shadow-md">
+                    <p class="text-lg font-medium text-indigo-700">Total Milk Bought</p>
+                    <p id="totalMilkBought" class="text-3xl font-bold text-indigo-900 mt-1">0.00 L</p>
+                </div>
+                <div class="bg-teal-50 p-5 rounded-lg shadow-md">
+                    <p class="text-lg font-medium text-teal-700">Total Milk Sold</p>
+                    <p id="totalMilkSold" class="text-3xl font-bold text-teal-900 mt-1">0.00 L</p>
+                </div>
+                <div class="bg-orange-50 p-5 rounded-lg shadow-md">
+                    <p class="text-lg font-medium text-orange-700">Total Payments Made</p>
+                    <p id="totalPaymentsMade" class="text-3xl font-bold text-orange-900 mt-1">₹0.00</p>
+                </div>
+                <div class="bg-lime-50 p-5 rounded-lg shadow-md">
+                    <p class="text-lg font-medium text-lime-700">Total Payments Received</p>
+                    <p id="totalPaymentsReceived" class="text-3xl font-bold text-lime-900 mt-1">₹0.00</p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Gross Profit / Loss</h3>
+            <div class="bg-purple-50 p-5 rounded-lg shadow-md mb-8">
+                <p class="text-lg font-medium text-purple-700">Gross Profit/Loss (Milk Value)</p>
+                <p id="grossProfitLoss" class="text-3xl font-bold text-purple-900 mt-1">₹0.00</p>
+                <p class="text-sm text-gray-600 mt-2">Calculated as (Value of Milk Sold) - (Value of Milk Bought) within the selected period.</p>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Milk Quantity Trends</h3>
+            <div class="bg-gray-50 p-5 rounded-lg shadow-inner">
+                <canvas id="milkQuantityChart"></canvas>
+                <p id="chartNoDataMessage" class="text-center text-gray-500 mt-4 hidden">No transaction data available for the selected period to generate chart.</p>
+            </div>
+        </section>
+
+        <!-- Data Management Section -->
+        <section id="dataManagementSection" class="tab-content hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Data Management (JSON File)</h2>
+            <p class="text-gray-700 mb-6">Use this section to export your current data as a JSON file for backup, or import data from a previously saved JSON file. Importing data will be *merged* with your current data in the application.</p>
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <button id="exportDataBtn" class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-md font-medium flex-grow">
+                    Export Data to JSON
+                </button>
+                <div class="flex-grow flex flex-col sm:flex-row gap-2">
+                    <input type="file" id="importFileInput" accept=".json" class="flex-grow block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-blue-50 file:text-blue-700
+                        hover:file:bg-blue-100"/>
+                    <button id="importDataBtn" class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-md font-medium">
+                        Import Data from JSON
+                    </button>
+                </div>
+            </div>
+            <div class="border-t pt-6 mt-6 border-red-200">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Danger Zone</h3>
+                <p class="text-gray-700 mb-4">This action will permanently delete ALL customer, transaction, and payment data from this application. This cannot be undone.</p>
+                <button id="deleteAllDataBtn" class="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-md font-medium w-full sm:w-auto">
+                    Delete All Data
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-4 text-center text-sm mt-8">
+        <p>&copy; <span id="currentYear"></span> Milk Trade Manager. All rights reserved.</p>
+    </footer>
+
+    <script src="resources/js/app.js"></script>
+</body>
+</html>
